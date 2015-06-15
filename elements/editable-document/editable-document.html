@@ -1,0 +1,91 @@
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-collection.html">
+<link rel="import" href="../../bower_components/firebase-element/firebase-document.html">
+
+<dom-module id="editable-document">
+
+  <style is="custom-style">
+  :host {
+    width: 100%;
+    display: block;
+  }
+  .button {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+  }
+  .green {
+    background-color: var(--google-green-500); //#4caf50;
+  }
+  h1, #title-input {
+    margin-right: 84px;
+  }
+  h1 {
+    margin: 28px 0 38px;
+    @apply(--paper-font-display1);
+  }
+  #title-input {
+    --paper-input-container-input: {
+      @apply(--paper-font-display1);
+    };
+
+    --paper-input-container-label: {
+      @apply(--paper-font-display1);
+    };
+  }
+  </style>
+
+  <template>
+    <iron-pages id="pages" selected="0">
+      <div id="viewer" class="active">
+        <paper-fab
+          class="button"
+          on-click="togglePage"
+          icon="create"></paper-fab>
+        <h1 class="title">[[note.title]]</h1>
+        <marked-element id="markdownContent" markdown="[[note.markdown]]"></marked-element>
+      </div>
+      <div id="editor">
+        <paper-fab
+          class="button green"
+          on-click="togglePage"
+          icon="done"></paper-fab>
+        <paper-input id="title-input" label="Title" value="{{note.title}}"></paper-input>
+        <paper-textarea label="Body" value="{{note.markdown}}"></paper-textarea>
+      </div>
+    </iron-pages>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'editable-document',
+      properties: {
+
+        note: {
+          type: Object,
+          notify: true
+        }
+
+      },
+
+      togglePage: function() {
+        this.$.pages.selectNext();
+      },
+
+      _updateFirebaseLocations: function(unused) {
+        // this.$.collection.location = this.location;
+        // this.$.activeDocument.location = this.location + "/" +  this.index;
+      },
+
+    });
+
+  </script>
+
+</dom-module>
