@@ -22,6 +22,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/marked-element/marked-element.html">
 <link rel="import" href="../../bower_components/firebase-element/firebase-collection.html">
 <link rel="import" href="../../bower_components/firebase-element/firebase-document.html">
+<link rel="import" href="../../bower_components/firebase-element/demo/x-pretty-json.html">
 <link rel="import" href="../editable-document/editable-document.html">
 
 
@@ -36,6 +37,7 @@ Extended Header + List Left + Card Over Toolbar
 
   <template>
     <firebase-collection
+      id="collection"
       location="https://torrid-inferno-2019.firebaseio.com/test"
       data="{{notes}}"></firebase-collection>
 
@@ -46,12 +48,15 @@ Extended Header + List Left + Card Over Toolbar
         <!-- List Toolbar -->
         <paper-toolbar class$="{{toolbarClass}}">
         </paper-toolbar>
+        <template is="dom-repeat" items="[[notes]]">
+          <x-pretty-json object="[[item]]"></x-pretty-json>
+        </template>
 
         <!-- List -->
         <paper-menu id="notes" class="list" on-iron-activate="_listTap" on-iron-select="selectNote" selected="0">
-          <template is="dom-repeat" items="[[notes]]" as="note">
-            <paper-item note="[[note]]">
-              <h4>[[note.title]]</h4>
+          <template is="dom-repeat" items="[[notes]]">
+            <paper-item note="[[item]]">
+              <h4>[[item.title]]</h4>
             </paper-item>
           </template>
         </paper-menu>
@@ -78,6 +83,7 @@ Extended Header + List Left + Card Over Toolbar
           <paper-material>
             <editable-document
               id="currentDocument"
+              on-delete="deleteNote"
               note="{{note}}"></editable-document>
           </paper-material>
 
@@ -111,12 +117,24 @@ Extended Header + List Left + Card Over Toolbar
         this._selectNote(item.note);
       },
 
+      deleteNote: function(e) {
+        this.$.collection.remove(e.detail.note);
+        var item = this.$.notes.items[0];
+        this._selectNote(item.note);
+        this.$.currentDocument.viewDocument();
+      },
+
       _selectNote: function(note) {
         this.$.documentSelector.select(note);
       },
 
       newNote: function() {
-
+        this.$.collection.add({
+          title: "",
+          markdown: ""
+        });
+        this._selectNote(this.$.collection.data[this.$.collection.data.length - 1]);
+        this.$.currentDocument.editDocument();
       },
 
       _listTap: function() {
